@@ -2,7 +2,7 @@
 Th code summuries some common pre-processing algorithm to deal with the raw point cloud data from RGB-D camera. The order of processes as following: (1) voxelize, (2) passThroughFilter - distance filter, (3) planar filter, (4) segmentation, (5) centroid Identification.\
 The point cloud data input as the image below (Depth data - left, RGB image - right):
 <p align="center">
-  <img src="https://github.com/buivn/images/blob/master/pcdInput.png" width="222">
+  <img src="https://github.com/buivn/images/blob/master/pcdInput.png" width="220">
   <img src="https://github.com/buivn/images/blob/master/4objectnew1.jpg" width="250">
 </p>
 The point cloud data after distance filtering (passThrough Filtering):
@@ -19,12 +19,12 @@ After planar filtering:
 <p align="center">
   <img src="https://github.com/buivn/images/blob/master/planerFiltering1.png" width="250">
 </p>
-After segmentation (presenting two objects):
+After segmentation:
 <p align="center">
-  <img src="https://github.com/buivn/images/blob/master/object1061319.png" width="160">
-  <img src="https://github.com/buivn/images/blob/master/object2061319.png" width="160">
-  <img src="https://github.com/buivn/images/blob/master/object3061319.png" width="160">
   <img src="https://github.com/buivn/images/blob/master/object4061319.png" width="160">
+  <img src="https://github.com/buivn/images/blob/master/object3061319.png" width="152">
+  <img src="https://github.com/buivn/images/blob/master/object1061319.png" width="152">
+  <img src="https://github.com/buivn/images/blob/master/object2061319.png" width="156">  
 </p>
 The centroids of four objects in the point cloud:
 <p align="center">
