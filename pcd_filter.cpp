@@ -63,7 +63,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr passthrough_filter(pcl::PointCloud<pcl::P
     pcl::PassThrough<pcl::PointXYZRGB> distance_pass;
     distance_pass.setInputCloud (cloud);
     distance_pass.setFilterFieldName ("z");
-    distance_pass.setFilterLimits (0.4, 1.0);
+    distance_pass.setFilterLimits (0.5, 1.4);
     //pass.setFilterLimitsNegative (true);
     distance_pass.filter (*cloud_filtered);
 
@@ -387,10 +387,9 @@ int main (int argc, char** argv)
 {
     pcl::PointCloud<pcl::PointXYZRGB> cloud, cloud2; //(new pcl::PointCloud<pcl::PointXYZ>);
     std::string filename, filenamejpg, filenamepcd, root; 
-    filename= "depthOnly0502";
-    //filename= "4object2";
-    root = "/home/bui/bui_ws/image_sample/";
-    //root = "/home/bui/bui_ws/image_sample/depthOnly0315/";
+    filename= "4objectnew1";
+    
+    root = "/home/bui/bui_ws/image_sample/GRBD052119/";
     filenamepcd = root +filename+".pcd";
 
     cloud = pcd_read(filenamepcd);
@@ -398,17 +397,17 @@ int main (int argc, char** argv)
 
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloudp1 (new pcl::PointCloud<pcl::PointXYZRGB>), cloudp4 (new pcl::PointCloud<pcl::PointXYZRGB>),
               cloudp2 (new pcl::PointCloud<pcl::PointXYZRGB>), cloudp3 (new pcl::PointCloud<pcl::PointXYZRGB>); 
-    //cloud1 = passthrough_filter(cloud.makeShared());
+    cloudp1 = passthrough_filter(cloud.makeShared());
+    show_pcd(cloudp1, 0, "After passThrough filtering");
 
     // show_pcd only work with pointer->use cloud.makeShared() to return a pointer
     // downsampling the data - cloudp1 is a pointer
-    cloudp1 = downsampling(cloud.makeShared());
-    cloudp4 = passthrough_filter(cloudp1);
-
+    cloudp1 = downsampling(cloudp1);
+    show_pcd(cloudp1, 0, "After downsampling");
 
     // cloudp2 is a pointer -  planar filter
     cloudp2 = planar_filter(cloudp4);
-    show_pcd(cloudp2, 0, "after filtering");
+    show_pcd(cloudp2, 0, "After planar filtering");
 
     std::vector<pcl::PointIndices> cluster_indices;
     cluster_indices = extract_object(cloudp2);
@@ -478,8 +477,8 @@ int main (int argc, char** argv)
     pcd_write(filename, cloudp3);
     show_centroid(cloudp3, centroid3D); 
 
-    // filenamejpg = root +filename+".jpg";
-    // drawboxrgb(centroid2D, filenamejpg);
+    filenamejpg = root +filename+".jpg";
+    drawboxrgb(centroid2D, filenamejpg);
     
     //std::cout << "Just check is everything still ok here?" << std::endl;
     return (0);
