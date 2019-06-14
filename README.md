@@ -1,4 +1,5 @@
 **PCL Fitlering and Centroids Calculating**\
+To run the program, user should adjust the link of input file (in main program) to file "4objectnew1.pcd".\
 Th code summuries some common pre-processing algorithm to deal with the raw point cloud data from RGB-D camera. The order of processes as following: (1) passThrough - distance Filter, (1) Downsampling by VoxelGrid, (3) planar filter, (4) segmentation, (5) Centroid Identification.\
 The point cloud data input as the image below (Depth data - left, RGB image - right):
 <p align="center">
@@ -34,3 +35,5 @@ The objects' 3D centroids in point cloud are converted to 2D centroids in RGB im
 <p align="center">
   <img src="https://github.com/buivn/images/blob/master/2Dcentroids.png" width="250">
 </p>
+
+**Meshing Two pointcloud of single object from two camera**
