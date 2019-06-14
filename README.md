@@ -3,7 +3,7 @@ Th code summuries some common pre-processing algorithm to deal with the raw poin
 The point cloud data input as the image below (Depth data - left, RGB image - right):\
 <p align="center">
   <img src="https://github.com/buivn/images/blob/master/pcdInput.png" width="238">
-  <img align="center" src="https://github.com/buivn/images/blob/master/4objectnew1.jpg" width="250">\
+  <img align="center" src="https://github.com/buivn/images/blob/master/4objectnew1.jpg" width="250">
 </p>
 The point cloud data after distance filtering (passThrough Filtering):\
 <p align="center">
