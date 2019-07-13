@@ -1,4 +1,4 @@
-**PCL Fitlering and Centroids Calculating**\
+# PCL Fitler and Centroids Calculation
 To run the program, user should adjust the link of input file (in main program) to file "4objectnew1.pcd".\
 Th code summuries some common pre-processing algorithm to deal with the raw point cloud data from RGB-D camera. The order of processes as following: (1) passThrough - distance Filter, (1) Downsampling by VoxelGrid, (3) planar filter, (4) segmentation, (5) Centroid Identification.\
 The point cloud data input as the image below (Depth data - left, RGB image - right):
