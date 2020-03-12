@@ -1,0 +1,50 @@
+<launch>
+
+    <include file="$(find wr_moveit_config)/launch/demo.launch">
+        <!-- <arg name="controller_box" value="$(arg controller_box)"/> -->
+    </include>
+
+   <!-- x y z qx qy qz qw -->
+    <node pkg="tf" type="static_transform_publisher" name="target_pose" args=" -0.00026 -0.0665181 0.541458 -0.0709864 -0.105792 -0.68871 0.712141 camera_frame target_pose_frame 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="frame_for_end_effector" args="0 0 -0.056 0.0 0.0 0.0 target_pose_frame ffee 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="camera_frame" args="-0.397 0 0.416 -0.5 -0.5 0.5 0.5 base_link camera_frame 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="camera_frame1" args="0 0 0 0 0 -1.047198 camera_frame camera_frame1 100" />
+
+    
+    <node pkg="tf" type="static_transform_publisher" name="target_pose_check" args="-0.4 0 0.45 0 -0.707106781 0 0.7071067812 base_link target_pose_check 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="target_pose_check2" args="0 0 0 0.0 0.0 0.3461170571 0.938191336 target_pose_check target_pose_check2 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="target_pose_check3" args="-0.35 0 0.55 -0.244742 -0.663401 0.244742 0.663401 base_link target_pose_check3 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="aruco_marker" args="-0.635 0 0.0 0.0 0.0 0.0 base_link aruco_marker 100" />
+
+
+
+    
+    
+
+
+    <node pkg="pcd_filter" type="target_pose" name="target_pose_from_movegroup" output="screen">
+        <param name="robot_name" value="wormRobot" />
+        <!-- <param name="robot_name" value="panda_arm" /> -->
+        <param name="base_link" value="base_link" />
+        <!-- <param name="base_link" value="panda_link0" /> -->
+        <param name="x" value="-0.42" />
+        <param name="z" value="0.55" />
+<!--         <param name="qua_x" value="-0.244742" />
+        <param name="qua_y" value="-0.663401" />
+        <param name="qua_z" value="0.244742" />
+        <param name="qua_w" value="0.663401" /> -->
+
+        <param name="qua_x" value="0" />
+        <param name="qua_y" value="-0.707106781" />
+        <param name="qua_z" value="0" />
+        <param name="qua_w" value="0.7071067812" />
+    </node>
+
+
+</launch>
