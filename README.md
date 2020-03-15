@@ -10,17 +10,8 @@ The point cloud data input as the image below (Depth data - left, RGB image - ri
   <img src="https://github.com/buivn/images/blob/master/cvUnr2019/pcdInput.png" width="220">
   <img src="https://github.com/buivn/images/blob/master/cvUnr2019/4objectnew1.jpg" width="250">
 </p>
-The point cloud data after distance/passThrough filtering:
-<p align="center">
-  <img src="https://github.com/buivn/images/blob/master/cvUnr2019/passThrough061319.png" width="250">
-</p>
 
-After downsampling by VoxelGrid:
-<p align="center">
-  <img src="https://github.com/buivn/images/blob/master/cvUnr2019/Downsampling061319.png" width="250">
-</p>
-
-After planar filtering: 
+Objects obtained after preprocessing: 
 <p align="center">
   <img src="https://github.com/buivn/images/blob/master/cvUnr2019/planerFiltering1.png" width="250">
 </p>
