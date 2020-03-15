@@ -15,13 +15,6 @@ Objects obtained after preprocessing:
 <p align="center">
   <img src="https://github.com/buivn/images/blob/master/cvUnr2019/planerFiltering1.png" width="250">
 </p>
-After segmentation:
-<p align="center">
-  <img src="https://github.com/buivn/images/blob/master/cvUnr2019/object4061319.png" width="163">
-  <img src="https://github.com/buivn/images/blob/master/cvUnr2019/object3061319.png" width="152">
-  <img src="https://github.com/buivn/images/blob/master/cvUnr2019/object1061319.png" width="152">
-  <img src="https://github.com/buivn/images/blob/master/cvUnr2019/object2061319.png" width="156">  
-</p>
 The centroids of four objects in the point cloud:
 <p align="center">
   <img src="https://github.com/buivn/images/blob/master/cvUnr2019/centroid3D.png" width="300">
