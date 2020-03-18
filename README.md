@@ -6,10 +6,11 @@ This repo contains all the functions, libraries which were used in the previous 
 (4) Point Cloud Boundary \
 (5) Area check \
 (6) Pose Estimation \
-(7) Plane's Height checkt
-(8) Path Availability in Mobile Transformation
+(7) Plane's Height check\
+(8) Path Availability in Mobile Transformation \
 - To get a stable point cloud data, we should combine the data in several time, then mesh the pointclouds into one. THe processing on the aggregated one is more stable than a single one.\
 
+The program works on ROS-Service approach. All functions are in the *pahap.cpp* file, which operates as a server. To trigger the service, the program *pcl_pahap_client.cpp* is invoked. It called the pahap server, and return a pose for the robot to move.\
 
 The point cloud data input as the image below (Depth data - left, RGB image - right):
 <p align="center">
