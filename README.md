@@ -12,6 +12,8 @@ This repo contains all the functions, libraries which were used in the previous 
 
 The program works on ROS-Service approach. All functions are in the *pahap.cpp* file, which operates as a server. To trigger the service, the program *pcl_pahap_client.cpp* is invoked. It called the pahap server, and return a pose for the robot to move.\
 
+The launch file is not stable -> check! \
+
 The point cloud data input as the image below (Depth data - left, RGB image - right):
 <p align="center">
   <img src="https://github.com/buivn/images/blob/master/cvUnr2019/pcdInput.png" width="220">
