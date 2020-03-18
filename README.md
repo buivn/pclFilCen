@@ -1,10 +1,16 @@
 # PCL Libraries
-This repo contains all the functions, libraries which were used in the previous projects. There are some main functions such as: 
+This repo contains all the functions, libraries which were used in the previous projects. There are some main functions such as: \
+(1) planar filter, \
+(2) segmentation, \
+(3) Centroid for each in a cluster set \
+(4) Point Cloud Boundary \
+(5) Area check \
+(6) Pose Estimation \
+(7) Plane's Height checkt
+(8) Path Availability in Mobile Transformation
+- To get a stable point cloud data, we should combine the data in several time, then mesh the pointclouds into one. THe processing on the aggregated one is more stable than a single one.\
 
 
-
-To run the program, user should adjust the link of input file (in main program) to file "4objectnew1.pcd".\
-Th code summuries some common pre-processing algorithm to deal with the raw point cloud data from RGB-D camera. The order of processes as following: (1) passThrough - distance Filter, (1) Downsampling by VoxelGrid, (3) planar filter, (4) segmentation, (5) Centroid Identification.\
 The point cloud data input as the image below (Depth data - left, RGB image - right):
 <p align="center">
   <img src="https://github.com/buivn/images/blob/master/cvUnr2019/pcdInput.png" width="220">
@@ -24,4 +30,4 @@ The objects' 3D centroids in point cloud are converted to 2D centroids in RGB im
   <img src="https://github.com/buivn/images/blob/master/cvUnr2019/2Dcentroids.png" width="250">
 </p>
 
-**Meshing Two pointcloud of single object from two camera**
+
