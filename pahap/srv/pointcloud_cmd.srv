@@ -3,4 +3,4 @@ bool topic
 string  path
 string num_name
 ---
-int32 result
+geometry_msgs/Pose planePose

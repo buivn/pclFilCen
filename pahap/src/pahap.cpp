@@ -5,40 +5,24 @@ namespace pahap
 {
 
 // constructor
-PahaP::PahaP(std::string topic_name) : 
+PahaP::PahaP(std::string t_Name, std::string f_Name, double s_Fact, double tol, bool s_Boun, bool s_Rect, bool s_Pose, double f_W, double f_L): 
   nh_(ros::NodeHandle()),
   nh_private_(ros::NodeHandle("~")),
   pcl_input_(new pclXYZRGB),
   pclFile_input_(new pclXYZRGB),
   pclTopic_input_(new pclXYZRGB)
 {
-  pclTopic_ = topic_name;
-  // initialize other element
-  // initPublisher();
-  initSubscriber();
-  initServer();
-}
-
-// the second constructor
-PahaP::PahaP(std::string file_name, int check):
-  nh_(ros::NodeHandle()),
-  nh_private_(ros::NodeHandle("~")),
-  pcl_input_(new pclXYZRGB),
-  pclFile_input_(new pclXYZRGB),
-  pclTopic_input_(new pclXYZRGB)
-{
-  //pcl::PointCloud<pcl::PointXYZRGB> cloud; 
-  if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (file_name, *pclFile_input_)) //* load the file
-  //if (pcl::FileReader::read(filename, *cloud) == -1) //* load the file
-  {
+  pclTopic_ = t_Name;
+  if (pcl::io::loadPCDFile<pcl::PointXYZRGB> (f_Name, *pclFile_input_)) {
       PCL_ERROR ("Couldn't read the point cloud data file \n");
-      //return (-1);
   }
-  // std::cout << "Loaded "
-  //         << pcl_input_->width * pcl_input_->height
-  //         << " data points from the pcd file with the following fields: "
-  //         << std::endl;
-
+  slicingFactor_ = s_Fact;
+  tolerance_ = tol;
+  showBound_ = s_Boun;
+  showSelRect_ = s_Rect;
+  showPose_ = s_Pose;
+  rFWidth_ = f_W;
+  rFLength_ = f_L;  
   // initialize other element
   // initPublisher();
   initSubscriber();
@@ -79,10 +63,10 @@ bool PahaP::check_and_save(pahap::pointcloud_cmd::Request &req,
     // writer.write<pcl::PointXYZRGB> (ss.str(), *pcl_input_, false);
     if (req.topic) copyPointCloud(*pclTopic_input_, *pcl_input_);
     else copyPointCloud(*pclFile_input_, *pcl_input_); 
-
-
+    // display_pcd(pcl_input_, 0, "Original Plane");
     pclXYZRGB::Ptr pcl_pass (new pclXYZRGB);
     pcl_pass = passthrough_filter(pcl_input_);
+    // pcl_pass = passthrough_filter(pclTopic_input_);
     pcl_pass = downsampling(pcl_pass);
     pcl_pass = est_plane(pcl_pass);
     // display_pcd(pcl_pass, 0, "Plane estimation");
@@ -91,13 +75,15 @@ bool PahaP::check_and_save(pahap::pointcloud_cmd::Request &req,
     Ev4f cen;
     // calculate the centroid of the plane
     pcl::compute3DCentroid(*pcl_pass, cen);
-    //display_planeNormals(pcl_pass, normal, cen);
+    // display_planeNormals(pcl_pass, normal, cen);
 
     EvXf maxmin_xyz;
     maxmin_xyz = det_MaxMinxyz(pcl_pass);
     SvEv3f bound;
-    bound = est_BounPoint(pcl_pass, maxmin_xyz, 0.016);
-    // display_pointSet_asPointCloud(bound);
+    bound = est_BounPoint(pcl_pass, maxmin_xyz, slicingFactor_);
+    if (showBound_){
+      display_pointSet_asPointCloud(bound);
+    }
     
     // EvXf closFart;
     // closFart = est_clofarPoints_toCentroid(bound, cen);
@@ -110,26 +96,29 @@ bool PahaP::check_and_save(pahap::pointcloud_cmd::Request &req,
     fiPoints = est_5closPoints_toCentroid(bound, cen);
     // std::cout << fiPoints << std::endl;
     EmXf fiveRect, selRect;
-    fiveRect = det_5rectangle(fiPoints, cen, normal, 0.48, 0.28);
+    fiveRect = det_5rectangle(fiPoints, cen, normal, rFLength_, rFWidth_);
     // draw_Rectangles(fiveRect, pcl_pass);
-    selRect = select_Rectangle(fiveRect, cen, bound);
-    // draw_Rectangles(selRect, pcl_pass);
+    selRect = select_Rectangle(fiveRect, cen, bound, tolerance_);
+    if (showSelRect_) draw_Rectangles(selRect, pcl_pass);
 
     geometry_msgs::Pose pose2;
     pose2 = est_Pose2(selRect, normal);
+
     
     Em4f  RotMatrix;
     RotMatrix = convert_PosetoRotationMatrix(pose2);
-    display_targetCoordinate(pcl_pass, RotMatrix);
-
-    
-    // ss1 << req.path + req.num_name+"pass.pcd";
-    // writer.write<pcl::PointXYZRGB> (ss1.str(), *pcl_pass, false);
-
-
-
-    res.result = 0;
+    if (showPose_) display_targetCoordinate(pcl_pass, RotMatrix);
+    // res.planePose = pose2;
+    res.planePose.position.x = pose2.position.x;
+    res.planePose.position.y = pose2.position.y;
+    res.planePose.position.z = pose2.position.z;
+    res.planePose.orientation.w = pose2.orientation.w;
+    res.planePose.orientation.x = pose2.orientation.x;
+    res.planePose.orientation.y = pose2.orientation.y;
+    res.planePose.orientation.z = pose2.orientation.z;
+    return true;
   }
+  else return false;
 }
 
 pclXYZRGB pcd_read(const std::string& filename) {
@@ -288,7 +277,7 @@ EvXf PahaP::det_MaxMinxyz(pclXYZRGB::Ptr cloudp) {
     return max_min;
 }
 // get the set of boundary points
-SvEv3f PahaP::est_BounPoint(pclXYZRGB::Ptr cloudp, EvXf MaxMinxyz, float slicing_factor)  // slicing_factor =0.016
+SvEv3f PahaP::est_BounPoint(pclXYZRGB::Ptr cloudp, EvXf MaxMinxyz, float slicing_factor)  // slicing_factor =0.02
 {
     
   std::vector<Eigen::Vector3f> boundaryPoint;
@@ -584,8 +573,8 @@ EmXf PahaP::det_5rectangle(EmXf fiPoint, Ev4f centroid, Ev3f normal, float l, fl
       fiveRectangle(i,4) = fiveRectangle(i,1) - factor_x*e_x(1);
       fiveRectangle(i,5) = fiveRectangle(i,2) - factor_x*e_x(2);
       // other points on y-axis 
-      // l is the length of two robot feet (l=0.48)
-      float factor_y = l/(2*sqrt(pow(e_y(0),2)+pow(e_y(1),2)+pow(e_y(2),2)));
+      // l is the length of robot feet (l=0.24)
+      float factor_y = l/sqrt(pow(e_y(0),2)+pow(e_y(1),2)+pow(e_y(2),2));
       // point 3
       fiveRectangle(i,6) = fiveRectangle(i,0) + factor_y*e_y(0);
       fiveRectangle(i,7) = fiveRectangle(i,1) + factor_y*e_y(1);
@@ -618,7 +607,7 @@ EmXf PahaP::det_5rectangle(EmXf fiPoint, Ev4f centroid, Ev3f normal, float l, fl
     return fiveRectangle;
 }
 
-EmXf PahaP::select_Rectangle(EmXf fiRect, Ev4f centroid, SvEv3f B_Point)
+EmXf PahaP::select_Rectangle(EmXf fiRect, Ev4f centroid, SvEv3f B_Point, double tolerance)
 {
   Eigen::MatrixXf threeClosest = Eigen::MatrixXf::Zero(3,3);
   Eigen::Vector3f threeDistance(0,0,0);
@@ -691,11 +680,11 @@ EmXf PahaP::select_Rectangle(EmXf fiRect, Ev4f centroid, SvEv3f B_Point)
       if (check2 < 0) check2 = -check2;
       if (check3 < 0) check3 = -check3;
       error_sum = error_sum + check1 + check2 + check3;
-      if ((d_c < d_1) or (check1 < 0.05))
+      if ((d_c < d_1) or (check1 < tolerance))
         cond1 = true;
-      if ((d_c < d_2) or (check2 < 0.05))
+      if ((d_c < d_2) or (check2 < tolerance))
         cond2 = true;
-      if ((d_c < d_3) or (check3 < 0.05))
+      if ((d_c < d_3) or (check3 < tolerance))
         cond3 = true;
       // check condition the point lies inside or on the boundary of pointcloud
       if (cond1 and cond2 and cond3)   // error of 5% = 0.05
@@ -727,8 +716,7 @@ EmXf PahaP::select_Rectangle(EmXf fiRect, Ev4f centroid, SvEv3f B_Point)
 }
 
 // estimate the Quaternions by five closest points
-geometry_msgs::Pose PahaP::est_Pose2(EmXf rectangle, Ev3f ave_normal)
-{
+geometry_msgs::Pose PahaP::est_Pose2(EmXf rectangle, Ev3f ave_normal) {
     geometry_msgs::Pose robot_pose;
     Eigen::Matrix3f orie_matrix;
     Eigen::Vector3f origin(0,0,0), pose_posistion1, pose_posistion2;
@@ -783,6 +771,7 @@ geometry_msgs::Pose PahaP::est_Pose2(EmXf rectangle, Ev3f ave_normal)
     pose_posistion2[1] = (origin[1] + rectangle(0,16))/2;
     pose_posistion2[2] = (origin[2] + rectangle(0,17))/2;
     
+    // be sure that the first pose is always higher than the second one
     if (pose_posistion1(1) < pose_posistion2(1))
     {  
       robot_pose.position.x = pose_posistion1(0);
@@ -1219,13 +1208,32 @@ int main(int argc, char **argv)
   // pointcloudServer pclServer;
   ros::init(argc, argv, "pahap_processing");
   ros::NodeHandle nh;
+  ros::NodeHandle n_para;
   ros::Rate loop_rate(100);
-  std::string pointcloudTopic = "/camera_remote/depth_registered/points";
-  // std::string filename = "/home/buivn/bui_ws/src/pahap/src/bridge_0225_1.pcd";
-  std::string filename = "/home/buivn/bui_ws/src/pahap/src/check1.pcd";
 
-  // pahap::PahaP pahap_process(pointcloudTopic);
-  pahap::PahaP pahap_process(filename, 1);
+  double slicingFactor, tolerance, rFL, rFW;
+  n_para.param("slicingFactor", slicingFactor, 0.02);
+  n_para.param("tolerance", tolerance, 0.05);
+  n_para.param("robotFootWidth", rFW, 0.28);
+  n_para.param("robotFootLength", rFL, 0.24);
+  
+  bool showBound, showSelRect, showPose;
+  // n_para.param("showBoundary", showBound, false);
+  n_para.param("showBoundary", showBound, true);
+  n_para.param("showSelectRectange", showSelRect, true);
+  n_para.param("showPose", showPose, true);
+  // ROS_INFO_STREAM("The value of showBoundary is: [%s]", showBound.toString().c_str());
+  // ROS_INFO("The value of showBoundary is: [%s]", showBound);
+  
+  
+
+
+  std::string pclTopic;
+  n_para.param("pclTopic", pclTopic, std::string("/camera_remote/depth_registered/points"));
+  std::string filename;
+  n_para.param("fileAddress", filename, std::string("/home/buivn/bui_ws/src/pahap/src/check1.pcd"));
+
+  pahap::PahaP pahap_process(pclTopic, filename, slicingFactor, tolerance, showBound, showSelRect, showPose, rFW, rFL);
 
   ros::spin();
   // while (ros::ok())

@@ -59,9 +59,9 @@ namespace pahap
   {
     public:     // public function
       // constructor with a point cloud topic
-      PahaP(std::string topic_name);
+      PahaP(std::string t_Name, std::string f_Name, double s_Fact, double tol, bool s_Boun, bool s_Rect, bool s_Pose, double f_W, double f_L);
       // constructor with a pcd file
-      PahaP(std::string file_name, int check);
+      // PahaP(std::string file_name, int check);
       // ~PahaP();
       
       // list of displaying functions
@@ -98,7 +98,7 @@ namespace pahap
       EmXf est_5closPoints_toCentroid(SvEv3f B_Point, Ev4f centroid);
       // determine 5 rectangles with five closest point to the centroid
       EmXf det_5rectangle(EmXf fiPoint, Ev4f centroid, Ev3f normal, float l, float w);
-      EmXf select_Rectangle(EmXf fiRect, Ev4f centroid, SvEv3f B_Point);
+      EmXf select_Rectangle(EmXf fiRect, Ev4f centroid, SvEv3f B_Point, double tolerance);
       geometry_msgs::Pose est_Pose2(EmXf rectangle, Ev3f ave_normal); // estimate the Quaternions by five closest points
       SvPclIndices extract_objects(pclXYZRGB::Ptr cloud);
       Em4f est_objectCentroids(pclXYZRGB::Ptr cloud, SvPclIndices c_indices, int nCluster);
@@ -129,6 +129,14 @@ namespace pahap
       pclXYZRGB::Ptr pclTopic_input_;
       pclXYZRGB::Ptr pclFile_input_;
       pclXYZRGB::Ptr pcl_input_;
+
+      double slicingFactor_;
+      double tolerance_;
+      double rFWidth_;
+      double rFLength_;
+      bool showBound_;
+      bool showSelRect_;
+      bool showPose_;
   };
 }
 
